@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>CYBER // TRIAL</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070b14;--bg2:radial-gradient(circle at 20% 0%,#0d1730 0%,#070b14 55%);--panel:#0e1526;--panel2:#111a2f;--border:#1e2942;--text:#e8edf7;--muted:#8592ac;--cyan:#22d3ee;--blue:#4f8dfd;--green:#34d399;--amber:#f5a524;--red:#f5455c;--mono:'JetBrains Mono',ui-monospace,Menlo,Consolas,monospace;--sans:'Inter',-apple-system,'Segoe UI',sans-serif}
+:root[data-theme="light"]{--bg:#eef1f7;--bg2:none;--panel:#fff;--panel2:#f6f8fc;--border:#dde3ee;--text:#0f1626;--muted:#5b6b85}
+*{box-sizing:border-box}
+html{scroll-padding-top:70px}
+body{margin:0;background:var(--bg) var(--bg2, none);background-attachment:fixed;color:var(--text);font-family:var(--sans);padding-top:calc(56px + env(safe-area-inset-top,0px));padding-bottom:env(safe-area-inset-bottom,0px)}
+a{color:inherit}
+.topbar{position:fixed;top:0;left:0;right:0;height:56px;padding-top:env(safe-area-inset-top,0px);display:flex;align-items:center;justify-content:space-between;gap:12px;background:color-mix(in srgb,var(--panel) 88%,transparent);backdrop-filter:blur(10px);border-bottom:1px solid var(--border);z-index:20;padding-left:18px;padding-right:18px;font-size:.85rem}
+.brand{display:flex;align-items:center;gap:8px;font-weight:700;letter-spacing:.02em;white-space:nowrap}
+.brand .accent{color:var(--cyan)}
+.center{color:var(--muted);position:absolute;left:50%;transform:translateX(-50%);display:none}
+@media(min-width:760px){.center{display:block}}
+.right{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:flex-end}
+.chip{background:var(--panel2);border:1px solid var(--border);border-radius:7px;padding:4px 9px;font-family:var(--mono);font-size:.78rem;color:var(--muted)}
+.chip b{color:var(--text)}
+.status{display:flex;align-items:center;gap:6px;font-size:.78rem;color:var(--green)}
+.dot{width:7px;height:7px;border-radius:50%;background:var(--green);box-shadow:0 0 8px var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+.wrap{max-width:820px;margin:0 auto;padding:40px 18px 80px}
+.hero{text-align:center;margin-bottom:38px}
+.hero h1{font-size:clamp(1.6rem,4vw,2.4rem);letter-spacing:-.01em;margin:0 0 10px;background:linear-gradient(90deg,var(--text),var(--cyan));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.hero .sub{color:var(--text);font-size:1.05rem;margin:0 0 6px;font-weight:500}
+.hero .mut{color:var(--muted);font-size:.9rem;margin:0 0 22px}
+.pills{display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+.pill{font-family:var(--mono);font-size:.78rem;padding:7px 14px;border-radius:20px;border:1px solid var(--border);color:var(--muted);background:var(--panel2)}
+.pill[data-state="active"]{color:var(--cyan);border-color:var(--cyan);box-shadow:0 0 12px -2px var(--cyan)}
+.pill[data-state="solved"]{color:var(--green);border-color:var(--green)}
+.task{background:var(--panel);border:1px solid var(--border);border-radius:14px;padding:26px 24px;margin-bottom:26px;transition:box-shadow .2s,opacity .2s;position:relative}
+.task[data-state="active"]{box-shadow:0 0 0 1px color-mix(in srgb,var(--cyan) 40%,transparent),0 0 30px -10px var(--cyan)}
+.task[data-state="solved"]{box-shadow:0 0 0 1px color-mix(in srgb,var(--green) 40%,transparent)}
+.task[data-state="locked"]{opacity:.45;pointer-events:none;filter:grayscale(.3)}
+.thead{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.tnum{font-family:var(--mono);color:var(--cyan);font-weight:700}
+.tcat{font-family:var(--mono);font-size:.75rem;letter-spacing:.08em;color:var(--muted)}
+.tstate{margin-left:auto;font-family:var(--mono);font-size:.7rem;letter-spacing:.05em;padding:3px 9px;border-radius:6px;border:1px solid var(--border);color:var(--muted)}
+.task[data-state="active"] .tstate{color:var(--cyan);border-color:var(--cyan)}
+.task[data-state="solved"] .tstate{color:var(--green);border-color:var(--green)}
+h2{margin:0 0 6px;font-size:1.25rem}
+.tdesc{color:var(--muted);margin:0 0 18px;font-size:.92rem;line-height:1.5}
+.term{background:#050810;border:1px solid var(--border);border-radius:10px;overflow:hidden;margin-bottom:14px}
+:root[data-theme="light"] .term{background:#0d1220}
+.termhead{padding:8px 14px;font-family:var(--mono);font-size:.78rem;color:var(--muted);border-bottom:1px solid var(--border)}
+.termbody{margin:0;padding:16px;font-family:var(--mono);font-size:.85rem;color:var(--cyan);white-space:pre-wrap;word-break:break-all;line-height:1.6}
+.cursor{animation:blink 1s step-end infinite}
+@keyframes blink{50%{opacity:0}}
+.btnrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px}
+.btn{font-family:var(--sans);font-size:.82rem;font-weight:600;padding:9px 16px;border-radius:8px;border:1px solid var(--border);background:var(--panel2);color:var(--text);cursor:pointer;transition:.15s}
+.btn:hover{border-color:var(--cyan)}
+.btn.primary{background:linear-gradient(90deg,var(--cyan),var(--blue));color:#04121c;border:none}
+.btn.small{padding:6px 12px;font-size:.75rem}
+.analysis{margin:6px 0 16px;font-family:var(--mono);font-size:.82rem}
+.scanline{color:var(--cyan)}
+.result{margin-top:10px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+.resulttop{font-weight:700;margin-bottom:8px;font-family:var(--sans);font-size:.88rem}
+.susrow{display:flex;align-items:center;gap:10px;font-size:.82rem;color:var(--muted)}
+.bar{flex:1;height:6px;background:var(--border);border-radius:4px;overflow:hidden;max-width:160px}
+.fill{height:100%;background:linear-gradient(90deg,var(--amber),var(--red))}
+.drop{border:2px dashed var(--border);border-radius:12px;padding:36px 16px;text-align:center;cursor:pointer}
+.drop:hover,.drop.over{border-color:var(--cyan)}
+.dropicon{font-size:1.8rem;margin-bottom:6px}
+.dropmain{font-weight:700;letter-spacing:.03em}
+.dropsub{color:var(--muted);font-size:.85rem;margin-top:2px}
+.dropreq{color:var(--muted);font-size:.75rem;margin-top:10px}
+.stegopanel{display:grid;grid-template-columns:1fr;gap:16px;margin-top:16px}
+@media(min-width:640px){.stegopanel{grid-template-columns:200px 1fr}}
+.stegoleft img{width:100%;border-radius:8px;border:1px solid var(--border);display:block}
+.livehead{font-family:var(--mono);font-size:.75rem;color:var(--cyan);letter-spacing:.06em;margin-bottom:8px}
+.checklist{font-family:var(--mono);font-size:.78rem;color:var(--muted);display:flex;flex-direction:column;gap:4px;margin-bottom:8px}
+.console{background:#050810;border:1px solid var(--border);border-radius:8px;padding:10px 12px;font-family:var(--mono);font-size:.75rem;color:var(--green);min-height:70px;white-space:pre-wrap}
+:root[data-theme="light"] .console{background:#0d1220}
+.findings .finding{border-radius:7px;padding:8px 11px;font-size:.82rem;margin-top:6px}
+.finding.bad{background:color-mix(in srgb,var(--red) 14%,transparent);color:var(--red)}
+.finding.ok{background:color-mix(in srgb,var(--green) 14%,transparent);color:var(--green)}
+.pkg{background:var(--panel2);border:1px solid var(--border);border-radius:10px;padding:14px 16px;margin-bottom:14px}
+.pkgfile{font-family:var(--mono);font-size:.85rem;margin-bottom:10px;color:var(--cyan)}
+.pkgrow{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:8px}
+.pkgnote{color:var(--muted);font-size:.78rem}
+.forensics{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:16px 0}
+.frow{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;display:flex;justify-content:space-between;font-size:.82rem}
+.frow span{color:var(--muted)}
+.frow b.ok{color:var(--green)}
+.frow b.bad{color:var(--amber)}
+.hintrow{margin-bottom:16px}
+.hinttext{margin-top:8px;font-size:.85rem;color:var(--cyan);font-family:var(--mono)}
+.submitrow label{display:block;font-family:var(--mono);font-size:.72rem;letter-spacing:.08em;color:var(--muted);margin-bottom:6px}
+.inputrow{display:flex;gap:8px;flex-wrap:wrap}
+.inputrow input{flex:1;min-width:200px;background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--text);font-family:var(--mono);font-size:.88rem}
+.inputrow input:focus{outline:none;border-color:var(--cyan)}
+.feedback{margin-top:10px;font-size:.85rem}
+.feedback .ok{color:var(--green);font-weight:700}
+.feedback .bad{color:var(--red);font-weight:700}
+[hidden]{display:none!important}
+footer{text-align:center;color:var(--muted);font-size:.78rem;padding:10px 20px 30px}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand">🛡 CYBER<span class="accent">//</span>TRIAL</div>
+  <div class="center">Selection Challenge</div>
+  <div class="right">
+    <span class="chip">ID <b id="cid"></b></span>
+    <span class="chip">Progress <b id="prog">0/3</b></span>
+    <span class="chip" id="timer">45:00</span>
+    <span class="status"><i class="dot"></i>Environment Online</span>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="hero">
+    <h1>THINK LIKE AN ATTACKER.</h1>
+    <p class="sub">Three practical challenges. One investigation mindset.</p>
+    <p class="mut">Analyze the evidence, identify the weakness, and recover the flag.</p>
+    <div class="pills">
+      <div class="pill" id="pill0" data-state="active">01 CRYPTO</div>
+      <div class="pill" id="pill1" data-state="locked">02 STEGO</div>
+      <div class="pill" id="pill2" data-state="locked">03 PWN</div>
+    </div>
+  </section>
+
+  <section class="task" id="task0" data-state="active">
+    <div class="thead"><span class="tnum">01</span><span class="tcat">CRYPTOGRAPHY</span><span class="tstate" id="state0">ACTIVE</span></div>
+    <h2>Decode the Message</h2>
+    <p class="tdesc">Something is hidden in the data below. Identify the pattern and recover the flag.</p>
+    <div class="term">
+      <div class="termhead">&gt; intercepted_message.txt</div>
+      <pre class="termbody" id="ct0">RlY4Q0VnbERGa0VRSEFGSEZsMEFFQzFERWtvUUtoMVZGVTQ9<span class="cursor">▌</span></pre>
+    </div>
+    <div class="btnrow">
+      <button class="btn" onclick="copyText('RlY4Q0VnbERGa0VRSEFGSEZsMEFFQzFERWtvUUtoMVZGVTQ9')">Copy</button>
+      <button class="btn" onclick="document.getElementById('analysis0').hidden=true">Clear</button>
+      <button class="btn primary" onclick="analyze(0)">Analyze</button>
+    </div>
+    <div class="analysis" id="analysis0" hidden>
+      <div class="scanline" id="scanline0">Initializing analysis…</div>
+      <div class="result" id="result0" hidden>
+        <div class="resulttop">Analysis complete</div>
+        <div class="findings" id="cryptofindings"></div>
+      </div>
+    </div>
+    <div class="hintrow"><button class="btn small" onclick="hint(0)">Request Hint</button><div class="hinttext" id="hint0"></div></div>
+    <div class="submitrow">
+      <label>ENTER FLAG</label>
+      <div class="inputrow"><input id="flag0" placeholder="flag{your_answer_here}" autocomplete="off" spellcheck="false"><button class="btn primary" onclick="submitFlag(0)">Submit Flag</button></div>
+      <div class="feedback" id="feedback0"></div>
+    </div>
+  </section>
+
+  <section class="task" id="task1" data-state="locked">
+    <div class="thead"><span class="tnum">02</span><span class="tcat">STEGANOGRAPHY</span><span class="tstate" id="state1">LOCKED</span></div>
+    <h2>Something Is Hidden Here</h2>
+    <p class="tdesc">Inspect the image carefully. The file may contain more than what you can see.</p>
+    <div class="pkgrow" style="margin-bottom:12px"><a class="btn" href="/challenges/network_schematic.png" download>Download Challenge File</a></div>
+    <div class="drop" id="drop1">
+      <input type="file" id="file1" accept="image/png" hidden>
+      <div class="dropicon">🖼</div>
+      <div class="dropmain">DROP .PNG HERE</div>
+      <div class="dropsub">or choose a file</div>
+      <div class="dropreq">PNG images only · Maximum file size: 10 MB</div>
+    </div>
+    <div class="stegopanel" id="stegopanel" hidden>
+      <div class="stegoleft"><img id="preview" alt=""></div>
+      <div class="stegoright">
+        <div class="livehead">LIVE ANALYSIS</div>
+        <div class="checklist" id="checklist"></div>
+        <pre class="console" id="console"></pre>
+        <div class="result" id="result1" hidden><div class="resulttop">SCAN COMPLETE</div><div class="findings" id="findings1"></div></div>
+      </div>
+    </div>
+    <div class="hintrow"><button class="btn small" onclick="hint(1)">Request Hint</button><div class="hinttext" id="hint1"></div></div>
+    <div class="submitrow">
+      <label>ENTER FLAG</label>
+      <div class="inputrow"><input id="flag1" placeholder="flag{your_answer_here}" autocomplete="off" spellcheck="false"><button class="btn primary" onclick="submitFlag(1)">Submit Flag</button></div>
+      <div class="feedback" id="feedback1"></div>
+    </div>
+  </section>
+
+  <section class="task" id="task2" data-state="locked">
+    <div class="thead"><span class="tnum">03</span><span class="tcat">BINARY EXPLOITATION</span><span class="tstate" id="state2">LOCKED</span></div>
+    <h2>Break the Welcome Portal</h2>
+    <p class="tdesc">You've been given a compiled Linux program. Understand how it behaves, identify the weakness, and reach the hidden success path.</p>
+    <div class="pkg">
+      <div class="pkgfile">📦 campusnet_portal</div>
+      <div class="pkgrow"><a class="btn" href="/challenges/campusnet_portal" download>Download Challenge</a><button class="btn" onclick="copyText('./campusnet_portal')">Copy Run Command</button></div>
+      <div class="pkgnote">Single dynamically-linked Linux x86-64 executable.</div>
+    </div>
+    <div class="term">
+      <div class="termhead">● sandbox terminal</div>
+      <pre class="termbody" id="termout">$ ./campusnet_portal
+=== CampusNet Welcome Portal v1.0 ===
+Enter your name: <span class="cursor">▌</span></pre>
+      <div class="btnrow" style="padding:0 16px 16px">
+        <div class="inputrow" style="flex:1"><input id="terminput" placeholder="input buffer"><button class="btn" onclick="sendInput()">Send Input</button></div>
+      </div>
+    </div>
+    <div class="forensics">
+      <div class="frow"><span>Architecture</span><b>x86-64 ELF</b></div>
+      <div class="frow"><span>Binary Type</span><b>Executable</b></div>
+      <div class="frow"><span>Environment</span><b>Linux Sandbox</b></div>
+      <div class="frow"><span>PIE</span><b class="bad">Disabled</b></div>
+      <div class="frow"><span>Canary</span><b class="bad">Disabled</b></div>
+      <div class="frow"><span>NX</span><b class="ok">Enabled</b></div>
+      <div class="frow"><span>RELRO</span><b class="bad">None</b></div>
+    </div>
+    <div class="hintrow"><button class="btn small" onclick="hint(2)">Request Hint</button><div class="hinttext" id="hint2"></div></div>
+    <div class="submitrow">
+      <label>ENTER FLAG</label>
+      <div class="inputrow"><input id="flag2" placeholder="flag{your_answer_here}" autocomplete="off" spellcheck="false"><button class="btn primary" onclick="submitFlag(2)">Submit Flag</button></div>
+      <div class="feedback" id="feedback2"></div>
+    </div>
+  </section>
+</div>
+<footer>CYBER // TRIAL · Selection Round Environment · <a href="#" id="resetBtn" style="color:var(--muted);text-decoration:underline">Reset progress</a></footer>
+
+<script>
+const LS_CODE_KEY = 'cyber_trial_code';
+let CODE = localStorage.getItem(LS_CODE_KEY) || '';
+let DEADLINE = null;
+
+function copyText(t){ navigator.clipboard && navigator.clipboard.writeText(t); }
+
+function setTaskState(i,s){
+  document.getElementById('task'+i).dataset.state=s;
+  document.getElementById('state'+i).textContent=s.toUpperCase();
+  document.getElementById('pill'+i).dataset.state=s;
+}
+
+function applyProgress(progress){
+  const solvedCount = progress.filter(p=>p.solved).length;
+  document.getElementById('prog').innerHTML = '<b>'+solvedCount+'/3</b>';
+  progress.sort((a,b)=>a.task_index-b.task_index).forEach((p,i)=>{
+    if(p.solved){
+      setTaskState(i,'solved');
+      document.getElementById('feedback'+i).innerHTML='<div class="ok">✓ FLAG ACCEPTED</div><div style="color:var(--muted)">Challenge completed'+(p.solved_at?(' · '+new Date(p.solved_at).toLocaleString()):'')+' · +100 pts</div>';
+    } else if(i===0 || progress[i-1].solved){
+      setTaskState(i,'active');
+    } else {
+      setTaskState(i,'locked');
+    }
+    if(p.hint_level>0 && p.hint_text){
+      document.getElementById('hint'+i).textContent='Hint '+p.hint_level+': '+p.hint_text;
+    }
+  });
+}
+
+async function initSession(){
+  const r = await fetch('/api/session', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ code: CODE })
+  });
+  const data = await r.json();
+  CODE = data.code;
+  DEADLINE = new Date(data.deadline).getTime();
+  localStorage.setItem(LS_CODE_KEY, CODE);
+  document.getElementById('cid').textContent = CODE;
+  applyProgress(data.progress);
+}
+
+setInterval(()=>{
+  if(!DEADLINE) return;
+  const remain = Math.max(0, Math.floor((DEADLINE-Date.now())/1000));
+  const m=String(Math.floor(remain/60)).padStart(2,'0'), s=String(remain%60).padStart(2,'0');
+  document.getElementById('timer').textContent = m+':'+s;
+},1000);
+
+async function analyze(i){
+  document.getElementById('analysis'+i).hidden=false;
+  const sl=document.getElementById('scanline'+i);
+  const steps=['Reading payload…','Checking encoding patterns…','Analyzing character distribution…'];
+  for(const s of steps){ sl.textContent=s; await new Promise(r=>setTimeout(r,420)); }
+
+  if(i===0){
+    const r = await fetch('/api/analyze/crypto', {method:'POST'});
+    const d = await r.json();
+    sl.textContent='Pattern detection complete';
+    document.getElementById('cryptofindings').innerHTML = `
+      <div class="frow"><span>Payload length</span><b>${d.length} bytes</b></div>
+      <div class="frow"><span>Encoding layers detected</span><b>${d.layersDetected} (${d.layerChain})</b></div>
+      <div class="frow"><span>Core entropy</span><b>${d.coreEntropyBitsPerByte} bits/byte</b></div>
+      <div class="frow"><span>Core printable ratio</span><b>${(d.corePrintableRatio*100).toFixed(1)}%</b></div>
+      <div class="frow"><span>Assessment</span><b class="${d.suspicious?'bad':'ok'}">${d.suspicious?'Suspicious':'Clean'}</b></div>
+      <div style="margin-top:8px;color:var(--muted);font-size:.82rem">${d.note}</div>`;
+  } else {
+    sl.textContent='Pattern detection complete';
+  }
+  document.getElementById('result'+i).hidden=false;
+}
+
+async function hint(i){
+  const r = await fetch('/api/hint', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ code: CODE, taskIndex: i })
+  });
+  if(!r.ok) return;
+  const d = await r.json();
+  document.getElementById('hint'+i).textContent = 'Hint '+d.level+': '+d.text;
+}
+
+async function submitFlag(i){
+  const val=document.getElementById('flag'+i).value.trim();
+  if(!val) return;
+  const fb=document.getElementById('feedback'+i);
+  const r = await fetch('/api/submit', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ code: CODE, taskIndex: i, value: val })
+  });
+  const d = await r.json();
+  if(d.correct){
+    fb.innerHTML='<div class="ok">✓ FLAG ACCEPTED</div><div style="color:var(--muted)">Challenge completed · '+new Date().toLocaleTimeString()+' · +100 pts</div>';
+    applyProgress(d.progress);
+  } else {
+    fb.innerHTML='<div class="bad">× NOT QUITE</div><div style="color:var(--muted)">Your submission does not match.</div>';
+  }
+}
+
+function lastIdx(hay,needle){outer:for(let i=hay.length-needle.length;i>=0;i--){for(let j=0;j<needle.length;j++)if(hay[i+j]!==needle[j])continue outer;return i}return -1}
+
+const drop1=document.getElementById('drop1'), file1=document.getElementById('file1');
+drop1.addEventListener('click',()=>file1.click());
+drop1.addEventListener('dragover',e=>{e.preventDefault();drop1.classList.add('over')});
+drop1.addEventListener('dragleave',()=>drop1.classList.remove('over'));
+drop1.addEventListener('drop',e=>{e.preventDefault();drop1.classList.remove('over');if(e.dataTransfer.files[0])handleStego(e.dataTransfer.files[0])});
+file1.addEventListener('change',e=>{if(e.target.files[0])handleStego(e.target.files[0])});
+
+async function handleStego(file){
+  document.getElementById('stegopanel').hidden=false;
+  document.getElementById('preview').src=URL.createObjectURL(file);
+  const items=['File signature verified','PNG structure inspected','Metadata analysis','Pixel-plane analysis','Hidden payload scan'];
+  const cl=document.getElementById('checklist'); cl.innerHTML=items.map((t,idx)=>`<div id="chk${idx}">[ ] ${t}</div>`).join('');
+  const lines=['inspecting PNG chunks...','checking metadata...','comparing pixel distributions...','examining least significant bits...','searching for anomalous payload...'];
+  const cons=document.getElementById('console'); cons.textContent='';
+  let anomaly=false, lsbEntropy=null;
+  try{
+    const bytes=new Uint8Array(await file.arrayBuffer());
+    if(bytes[0]===0x89&&bytes[1]===0x50){ const idx=lastIdx(bytes,[0x49,0x45,0x4e,0x44]); if(idx!==-1 && bytes.slice(idx+8).some(x=>x!==0)) anomaly=true; }
+    const bmp=await createImageBitmap(file);
+    const c=document.createElement('canvas'); c.width=bmp.width; c.height=bmp.height;
+    const ctx=c.getContext('2d'); ctx.drawImage(bmp,0,0);
+    const data=ctx.getImageData(0,0,bmp.width,bmp.height).data;
+    const bits=[]; const cap=400000;
+    for(let i=0;i<data.length && bits.length<cap;i+=4){ bits.push(data[i]&1,data[i+1]&1,data[i+2]&1); }
+    const n=Math.floor(bits.length/8); let run=0,best=0;
+    for(let i=0;i<n;i++){ let v=0; for(let j=0;j<8;j++)v=(v<<1)|bits[i*8+j]; if(v>=32&&v<=126){run++;if(run>best)best=run} else run=0; }
+    if(best>=16) anomaly=true;
+  }catch(e){}
+  for(let idx=0; idx<items.length; idx++){
+    await new Promise(r=>setTimeout(r,320));
+    document.getElementById('chk'+idx).textContent='[✓] '+items[idx];
+    cons.textContent += '> '+lines[idx]+'\n';
+  }
+  document.getElementById('result1').hidden=false;
+  document.getElementById('findings1').innerHTML = anomaly
+    ? '<div class="finding bad">[!] Anomaly detected — embedded payload signature found</div>'
+    : '<div class="finding ok">No structural anomalies found in this file.</div>';
+}
+
+function sendInput(){
+  const val=document.getElementById('terminput').value;
+  const out=document.getElementById('termout');
+  out.textContent += val + '\nHello, ' + val + '!\nGoodbye!\n\n$ ./campusnet_portal\n=== CampusNet Welcome Portal v1.0 ===\nEnter your name: ';
+  document.getElementById('terminput').value='';
+}
+
+document.getElementById('resetBtn').addEventListener('click', (e)=>{
+  e.preventDefault();
+  if(confirm('Start a new candidate session? Your current one stays recorded, but this browser will switch to a fresh one.')){
+    localStorage.removeItem(LS_CODE_KEY);
+    location.reload();
+  }
+});
+
+initSession();
+</script>
+</body>
+</html>

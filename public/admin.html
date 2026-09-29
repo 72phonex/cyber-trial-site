@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CYBER // TRIAL — Standings</title>
+<style>
+:root{--bg:#070b14;--panel:#0e1526;--panel2:#111a2f;--border:#1e2942;--text:#e8edf7;--muted:#8592ac;--cyan:#22d3ee;--green:#34d399;--red:#f5455c}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,'Segoe UI',sans-serif;padding:30px 18px 60px}
+.wrap{max-width:900px;margin:0 auto}
+h1{font-size:1.3rem;margin:0 0 4px}
+.sub{color:var(--muted);font-size:.85rem;margin:0 0 20px}
+table{width:100%;border-collapse:collapse;background:var(--panel);border:1px solid var(--border);border-radius:10px;overflow:hidden;font-size:.88rem}
+th,td{padding:10px 12px;text-align:left;border-bottom:1px solid var(--border)}
+th{color:var(--muted);font-weight:600;font-size:.78rem;text-transform:uppercase;letter-spacing:.04em;background:var(--panel2)}
+tr:last-child td{border-bottom:none}
+.yes{color:var(--green);font-weight:700}
+.no{color:var(--muted)}
+.keybox{margin-bottom:18px}
+.keybox input{background:var(--panel2);border:1px solid var(--border);border-radius:8px;padding:8px 10px;color:var(--text);font-family:monospace}
+.keybox button{background:var(--cyan);border:none;color:#04121c;font-weight:700;padding:8px 14px;border-radius:8px;cursor:pointer;margin-left:6px}
+#err{color:var(--red);margin-top:10px;font-size:.85rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>CYBER // TRIAL — Standings</h1>
+  <p class="sub">Organizer view. Requires the admin key.</p>
+  <div class="keybox">
+    <input type="password" id="key" placeholder="admin key">
+    <button onclick="load()">Load</button>
+  </div>
+  <div id="err"></div>
+  <table id="tbl" hidden>
+    <thead><tr><th>Candidate</th><th>Crypto</th><th>Stego</th><th>Pwn</th><th>Attempts</th><th>Last Solve</th></tr></thead>
+    <tbody id="rows"></tbody>
+  </table>
+</div>
+<script>
+const params = new URLSearchParams(location.search);
+const savedKey = params.get('key') || localStorage.getItem('cyber_trial_admin_key') || '';
+document.getElementById('key').value = savedKey;
+async function load(){
+  const key = document.getElementById('key').value.trim();
+  localStorage.setItem('cyber_trial_admin_key', key);
+  const err = document.getElementById('err'); err.textContent='';
+  const r = await fetch('/api/leaderboard?key=' + encodeURIComponent(key));
+  if(!r.ok){ err.textContent = r.status===403 ? 'Wrong key.' : 'Failed to load.'; return; }
+  const rows = await r.json();
+  document.getElementById('tbl').hidden = false;
+  const mark = v => v ? '<span class="yes">✓</span>' : '<span class="no">—</span>';
+  document.getElementById('rows').innerHTML = rows.map(r => `
+    <tr>
+      <td>${r.code}</td>
+      <td>${mark(r.crypto_solved)}</td>
+      <td>${mark(r.stego_solved)}</td>
+      <td>${mark(r.pwn_solved)}</td>
+      <td>${r.total_attempts || 0}</td>
+      <td>${r.last_solved_at ? new Date(r.last_solved_at).toLocaleString() : '—'}</td>
+    </tr>`).join('');
+}
+if(savedKey) load();
+</script>
+</body>
+</html>
